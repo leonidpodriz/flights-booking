@@ -23,3 +23,7 @@
 hs_err_pid*
 .idea/
 flights-booking.iml
+/target/
+.DS_Store
+
+
