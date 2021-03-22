@@ -14,15 +14,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 public class TestMain {
-    @Test
-    public void testAdd() {
-        assertEquals(Main.add(3, 5), 8);
-        assertEquals(Main.add(3, 6), 9);
-        assertEquals(Main.add(2, 3), 5);
-    }
 
     @Test
-    public void testGenerations(){
+    public void testGenerations() {
         List<Flight> flights = FlightsGenerator.generateFlights(1000);
 
         Map<String, Integer> elems = new HashMap<>();
@@ -42,7 +36,7 @@ public class TestMain {
     }
 
     @Test
-    public void testDbGeneration(){
+    public void testDbGeneration() {
         FlightsService service = new FlightsService();
         try {
             service.initializeDb();
