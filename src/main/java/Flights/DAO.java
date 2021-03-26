@@ -1,14 +1,16 @@
 package Flights;
 
+import Flights.Flight.Flight;
+
 import java.util.List;
 import java.util.Optional;
 
-public interface DAO<T> {
+public interface DAO {
 
-    Optional<T> get(String id);
+    Optional<Flight> get(String id);
 
-    List<T> getALL();
+    List<Flight> getAll();
 
-    boolean update(String number, T t);
+    boolean update(String number, Flight flight);
 
 }

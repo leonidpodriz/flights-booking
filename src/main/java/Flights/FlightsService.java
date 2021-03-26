@@ -1,6 +1,6 @@
 package Flights;
 
-import Flight.Flight;
+import Flights.Flight.Flight;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 
 
-public class FlightsService implements DAO<Flight> {
+public class FlightsService implements DAO{
 
     private final Map<String, Flight> db = new HashMap<>();
 
@@ -78,7 +78,7 @@ public class FlightsService implements DAO<Flight> {
     }
 
     @Override
-    public List<Flight> getALL() {
+    public List<Flight> getAll() {
         return new ArrayList<>(db.values());
     }
 

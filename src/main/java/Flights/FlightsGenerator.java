@@ -1,8 +1,8 @@
 package Flights;
 
-import Flight.Flight;
-import Flight.Destinations;
-import Flight.Departures;
+import Flights.Flight.Flight;
+import Flights.Flight.Destinations;
+import Flights.Flight.Departures;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;

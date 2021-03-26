@@ -1,4 +1,4 @@
-package Flight;
+package Flights.Flight;
 
 public enum Destinations {
     LONDON,
@@ -19,11 +19,11 @@ public enum Destinations {
     ROME,
     PARIS;
 
-    public static final Destinations[] dest = Destinations.values();
+    public static final Destinations[] destinations = Destinations.values();
 
     public static Destinations getRandomDest(){
-        int index = (int) (Math.random() * dest.length);
-        return dest[index];
+        int index = (int) (Math.random() * destinations.length);
+        return destinations[index];
     }
 
 }
