@@ -11,7 +11,7 @@ public class Callback {
     }
 
     public Callback(String name, Consumer<Console> toRun) {
-        this.name = name;
+        this(name);
         this.toRun = toRun;
     }
 
