@@ -1,3 +1,4 @@
+import Booking.Ticket;
 import Console.Callback;
 import Console.Console;
 import Console.ExitCallback;
@@ -5,6 +6,7 @@ import Console.RunnableConsole;
 import Flights.Flight.Flight;
 import Flights.FlightsService;
 import Schedule.Schedule;
+import Users.User.User;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -13,9 +15,11 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Main {
+    static User user;
     static FlightsService flightsService = new FlightsService();
     static Console console = new RunnableConsole(Main::getCallbacks);
 
@@ -89,6 +93,51 @@ public class Main {
             return;
         }
         console.println(flight.get().toString());
+
+        // TODO: Add booking
+    }
+
+    public static boolean isAuthenticated() {
+        return user != null;
+    }
+
+    public static void loginCallback(Console console) {
+        user = new User("Name", "Surname", "login", "password");
+        console.println("Shadow logged...");
+    }
+
+    public static void logoutCallback(Console console) {
+        user = null;
+    }
+
+    public static String getValue(Console console, String message, Predicate<String> predicate, String error) {
+        console.println(message);
+        return console.readString(predicate, error);
+    }
+
+    public static String getValue(Console console, String message) {
+        return getValue(console, message, s -> true, "");
+    }
+
+    public static void registerCallback(Console console) {
+        String name = getValue(console, "enter your name");
+        String surname = getValue(console, "enter your surname");
+        String login = getValue(console, "enter your login");
+        String password = getValue(console, "enter your password", s -> s.length() > 6, "password length should me greater than 6");
+
+        user = new User(name, surname, login, password);
+        console.println(String.format("User is registered! Hello, @%s", user.login));
+    }
+
+    public static void displayMyFlightsCallback(Console console) {
+        user.getAllTickets().stream().map(Ticket::toString).forEach(console::println);
+    }
+
+    public static void cancelFlightBookCallback(Console console) {
+        console.println("Your tickets:");
+        displayMyFlightsCallback(console);
+
+        String flight_id = getValue(console, "enter flight id");
     }
 
     public static ArrayList<Callback> getCallbacks() {
@@ -96,7 +145,15 @@ public class Main {
 
         callbacks.add(new Callback("Display online table", Main::showSchedule));
         callbacks.add(new Callback("Display flight information", Main::showFlightInformation));
-        callbacks.add(new Callback("Search and book flight", Main::searchAndBookFlight));
+        if (!isAuthenticated()) {
+            callbacks.add(new Callback("Login", Main::loginCallback));
+            callbacks.add(new Callback("Register", Main::registerCallback));
+        } else {
+            callbacks.add(new Callback("Cancel flight book", Main::cancelFlightBookCallback));
+            callbacks.add(new Callback("Search and book flight", Main::searchAndBookFlight));
+            callbacks.add(new Callback("Display my flights", Main::displayMyFlightsCallback));
+            callbacks.add(new Callback("Logout", Main::logoutCallback));
+        }
         callbacks.add(new ExitCallback());
 
         return callbacks;
