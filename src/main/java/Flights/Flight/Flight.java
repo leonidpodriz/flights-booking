@@ -1,9 +1,13 @@
-package Flight;
+package Flights.Flight;
+
+import Users.User.User;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Flight implements Serializable {
 
@@ -14,7 +18,7 @@ public class Flight implements Serializable {
     private final Departures depart;
     private final Destinations dest;
     private int places;
-
+    private final List<User> users = new ArrayList<>();
 
     public Flight(String number, LocalDateTime date, Departures depart, Destinations dest, int places) {
         this.number = number;
@@ -49,12 +53,17 @@ public class Flight implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("Flight number -> %s, flight date -> %s, flight time -> %s, flight departure -> %s, flight destination -> %s, flight free places -> %d\n",
+        return String.format("%8s %s %8s %s %s %s %s %s %-7s %s %d",
                 number,
+                new String(new char[20]).replace('\u0000', '-'),
                 date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)),
+                new String(new char[20]).replace('\u0000', '-'),
                 date.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)),
+                new String(new char[20]).replace('\u0000', '-'),
                 depart.name(),
+                new String(new char[20]).replace('\u0000', '-'),
                 dest.name(),
+                new String(new char[20]).replace('\u0000', '-'),
                 places);
     }
 
