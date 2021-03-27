@@ -13,4 +13,5 @@ public interface Console {
     String readString(Predicate<String> predicate, String description);
 
     void print(String text);
+    void println(String text);
 }
