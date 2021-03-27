@@ -8,23 +8,17 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public class RunnableConsole implements Console {
-    List<Callback> callbackList;
-    Supplier<List<Callback>> callbackSupplier;
+    final Supplier<List<Callback>> callbackSupplier;
     final PrintStream out = System.out;
     private boolean exit = false;
     Scanner scanner = new Scanner(System.in);
 
     public RunnableConsole(Callback... callbacks) {
-        this.callbackList = Arrays.asList(callbacks);
-        callbackSupplier = this::getStaticCallbacks;
+        this(() -> Arrays.asList(callbacks));
     }
 
     public RunnableConsole(Supplier<List<Callback>> callbackSupplier) {
         this.callbackSupplier = callbackSupplier;
-    }
-
-    private List<Callback> getStaticCallbacks() {
-        return callbackList;
     }
 
     @Override
@@ -78,6 +72,19 @@ public class RunnableConsole implements Console {
             } else {
                 scanner.next();
                 printInvalidChoice();
+            }
+        }
+    }
+
+    @Override
+    public int readInt(Predicate<Integer> predicate, String description) {
+        int number;
+        while (true) {
+            number = readInt();
+            if (predicate.test(number)) {
+                return number;
+            } else {
+                printInvalidValue(description);
             }
         }
     }
