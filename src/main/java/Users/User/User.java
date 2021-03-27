@@ -2,14 +2,15 @@ package Users.User;
 
 import Booking.Ticket;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class User {
-    public final String name;
-    public final String surname;
-    public final String login;
-    private final String password;
+public class User implements Serializable {
+    public  String name;
+    public  String surname;
+    public  String login;
+    private String password;
     public final List<Ticket> tickets = new ArrayList<>();
     public boolean isAuth = false;
 

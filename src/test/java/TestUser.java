@@ -1,20 +1,23 @@
 import Booking.Ticket;
-import Flights.Flight.Departures;
-import Flights.Flight.Destinations;
+import Flights.Flight.Flight;
+import Flights.FlightsGenerator;
 import Users.User.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestUser {
     private User testUser;
+    private  Flight flight;
+    private Ticket testTicket;
 
     @BeforeEach
     public void createUser(){
         testUser = new User("test", "test", "test", "12345");
+        flight = FlightsGenerator.generateFlights(1).get(0);
+        testTicket = new Ticket(testUser, flight);
     }
 
     @Test
@@ -48,7 +51,6 @@ public class TestUser {
 
     @Test
     public void addTicket(){
-        Ticket testTicket = new Ticket(testUser, "test", Destinations.ANKARA, Departures.KYIV, LocalDateTime.now());
         testUser.addTicket(testTicket);
         Ticket[] testArr = {testTicket};
         assertArrayEquals(testArr, testUser.getAllTickets().toArray());
@@ -56,7 +58,6 @@ public class TestUser {
 
     @Test
     public void removeTicket(){
-        Ticket testTicket = new Ticket(testUser, "test", Destinations.ANKARA, Departures.KYIV, LocalDateTime.now());
         testUser.addTicket(testTicket);
         testUser.removeTicket(testTicket.ticketNumber);
         assertEquals(testUser.getAllTickets().size(), 0);

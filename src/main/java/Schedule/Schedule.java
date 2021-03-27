@@ -12,7 +12,7 @@ public class Schedule {
         this.flights = flights;
     }
 
-    public  void showFlights() {
+    public void showFlights() {
         System.out.printf("FLIGHT NUMBER%sFLIGHT DATE%sFLIGHT TIME%sFLIGHT DEPARTURE%sFLIGHT DESTINATION%sFLIGHT FREE PLACES\n",
                 new String(new char[17]).replace('\0', ' '),
                 new String(new char[18]).replace('\0', ' '),

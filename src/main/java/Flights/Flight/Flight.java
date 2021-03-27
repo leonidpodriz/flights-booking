@@ -29,6 +29,20 @@ public class Flight implements Serializable {
     }
 
 
+    public void addUser(User user){
+        users.add(user);
+        places--;
+    }
+
+    public void removeUser(User user){
+        if (users.remove(user)) places++;
+    }
+
+    public void removeUser(String userLogin){
+        if (users.removeIf(x -> x.login.equals(userLogin))) places++;
+    }
+
+
     public String getNumber() {
         return number;
     }
@@ -42,6 +56,8 @@ public class Flight implements Serializable {
     }
 
     public Destinations getDest() { return dest; }
+
+    public Departures getDepart(){return depart;}
 
     public int getPlaces() {
         return places;
@@ -77,6 +93,6 @@ public class Flight implements Serializable {
         if (this.places != f.places) return false;
         return this.getNumber().equals(f.getNumber()) &&
                 this.getDate().toString().equals(f.getDate().toString()) &&
-                this.getDest().name().equals(f.getDest().name());
+                this.getDest().name().equals(f.getDest().name()) && users.equals(f.users);
     }
 }
