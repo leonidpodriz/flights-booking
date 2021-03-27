@@ -25,7 +25,7 @@ public class Main {
     static Callback exitCallback = new Callback("Exit", Main::exitCallbackRunner);
 
     public static void exitCallbackRunner(Console console) {
-        console.println("Good bye!");
+        console.printLine("Good bye!");
         console.prepareToExit();
     }
 
@@ -56,7 +56,7 @@ public class Main {
         List<Flight> allFlights = flightsService.getAll();
         List<String> possibleDestination = allFlights.stream().map(f -> f.getDest().name().toLowerCase()).collect(Collectors.toList());
 
-        console.println("Enter destination:");
+        console.printLine("Enter destination:");
         String destination = console.readString(
                 s -> possibleDestination.contains(s.toLowerCase()),
                 String.format("one of: %s", String.join(", ", possibleDestination)));
@@ -65,7 +65,7 @@ public class Main {
         LocalDate date1 = LocalDate.now();
         do {
             try {
-                console.println("Enter date [MM.dd.yyyy]:");
+                console.printLine("Enter date [MM.dd.yyyy]:");
                 date1 = LocalDate.parse(console.readString(), DateTimeFormatter.ofPattern("MM.dd.yyyy"));
                 isDateInvalid = false;
             } catch (DateTimeParseException e) {
@@ -75,7 +75,7 @@ public class Main {
 
         LocalDate date = date1;
 
-        console.println("Enter peoples count:");
+        console.printLine("Enter peoples count:");
         int peoplesCount = console.readInt();
 
         String searchResult = flightsService.getAll()
@@ -85,20 +85,20 @@ public class Main {
                 .collect(Collectors.joining("\n"));
 
         if (searchResult.isEmpty()) {
-            console.println("No flight founded!");
+            console.printLine("No flight founded!");
             return;
         }
 
-        console.println(searchResult);
-        console.println("Enter flight ID:");
+        console.printLine(searchResult);
+        console.printLine("Enter flight ID:");
         String flight_id = console.readString();
         Optional<Flight> flight = flightsService.get(flight_id);
 
         if (!flight.isPresent()) {
-            console.println("Incorrect flight ID!");
+            console.printLine("Incorrect flight ID!");
             return;
         }
-        console.println(flight.get().toString());
+        console.printLine(flight.get().toString());
 
         // TODO: Add booking
     }
@@ -109,7 +109,7 @@ public class Main {
 
     public static void loginCallback(Console console) {
         user = new User("Name", "Surname", "login", "password");
-        console.println("Shadow logged...");
+        console.printLine("Shadow logged...");
     }
 
     public static void logoutCallback(Console console) {
@@ -117,7 +117,7 @@ public class Main {
     }
 
     public static String getValue(Console console, String message, Predicate<String> predicate, String error) {
-        console.println(message);
+        console.printLine(message);
         return console.readString(predicate, error);
     }
 
@@ -132,15 +132,15 @@ public class Main {
         String password = getValue(console, "enter your password", s -> s.length() > 6, "password length should me greater than 6");
 
         user = new User(name, surname, login, password);
-        console.println(String.format("User is registered! Hello, @%s", user.login));
+        console.printLine(String.format("User is registered! Hello, @%s", user.login));
     }
 
     public static void displayMyFlightsCallback(Console console) {
-        user.getAllTickets().stream().map(Ticket::toString).forEach(console::println);
+        user.getAllTickets().stream().map(Ticket::toString).forEach(console::printLine);
     }
 
     public static void cancelFlightBookCallback(Console console) {
-        console.println("Your tickets:");
+        console.printLine("Your tickets:");
         displayMyFlightsCallback(console);
 
         String flight_id = getValue(console, "enter flight id");

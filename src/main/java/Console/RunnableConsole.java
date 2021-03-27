@@ -10,8 +10,10 @@ import java.util.function.Supplier;
 public class RunnableConsole implements Console {
     final Supplier<List<Callback>> callbackSupplier;
     final PrintStream out = System.out;
+    final Scanner scanner = new Scanner(System.in);
+
     private boolean exit = false;
-    Scanner scanner = new Scanner(System.in);
+
 
     public RunnableConsole(Callback... callbacks) {
         this(() -> Arrays.asList(callbacks));
@@ -31,6 +33,11 @@ public class RunnableConsole implements Console {
         out.print(text);
     }
 
+    @Override
+    public void printLine(String text) {
+        print(String.format("%s\n", text));
+    }
+
     public void printInvalidValue(String expected) {
         print(String.format("Invalid value! Expected %s.\n", expected));
     }
@@ -41,10 +48,6 @@ public class RunnableConsole implements Console {
 
     public void printPrompt() {
         print(">>> ");
-    }
-
-    public void println(String text) {
-        print(String.format("%s\n", text));
     }
 
     private void printBreak() {

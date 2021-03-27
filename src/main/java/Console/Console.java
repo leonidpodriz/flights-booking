@@ -16,5 +16,5 @@ public interface Console {
 
     void print(String text);
 
-    void println(String text);
+    void printLine(String text);
 }
