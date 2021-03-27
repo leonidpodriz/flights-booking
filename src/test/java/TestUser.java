@@ -20,25 +20,15 @@ public class TestUser {
         testTicket = new Ticket(testUser, flight);
     }
 
-    @Test
-    public void authTest(){
-        assertFalse(testUser.isAuth);
-        testUser.setIsAuth();
-        assertTrue(testUser.isAuth);
-        testUser.logout();
-        assertFalse(testUser.isAuth);
-    }
 
     @Test
     public void checkUser(){
         String wrongUserName = "wrong";
         String wrongPassword = "wrong";
         assertFalse(testUser.checkUser(wrongUserName, wrongPassword));
-        assertFalse(testUser.isAuth);
         String rightUserName = "test";
         String rightPassword = "12345";
         assertTrue(testUser.checkUser(rightUserName, rightPassword));
-        assertTrue(testUser.isAuth);
     }
 
     @Test

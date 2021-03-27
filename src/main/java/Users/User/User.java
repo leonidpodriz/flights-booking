@@ -12,7 +12,6 @@ public class User implements Serializable {
     public  String login;
     private String password;
     public final List<Ticket> tickets = new ArrayList<>();
-    public boolean isAuth = false;
 
     public User(String name, String surname, String login, String password) {
         this.name = name;
@@ -25,7 +24,6 @@ public class User implements Serializable {
     public boolean checkUser(String login, String password){
         boolean check = login.equals(this.login) && password.equals(this.password);
         if (check){
-            setIsAuth();
             return true;
         }
         return false;
@@ -43,14 +41,6 @@ public class User implements Serializable {
         return tickets;
     }
 
-    public void setIsAuth(){
-        isAuth = true;
-    }
-
-    public void logout(){
-        isAuth = false;
-    }
-
     @Override
     public String toString(){
         return String.format("User name -> %s, user surname -> %s, user login -> %s", name, surname, login);
@@ -65,7 +55,6 @@ public class User implements Serializable {
                 this.surname.equals(user.surname) &&
                 this.login.equals(user.login) &&
                 this.password.equals(user.password) &&
-                this.isAuth == user.isAuth &&
                 this.tickets.equals(user.tickets);
     }
 }

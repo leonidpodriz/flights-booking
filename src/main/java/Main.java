@@ -1,3 +1,4 @@
+import Booking.BookingController;
 import Booking.Ticket;
 import Console.Callback;
 import Console.Console;
@@ -7,6 +8,7 @@ import Flights.Flight.Flight;
 import Flights.FlightsService;
 import Schedule.Schedule;
 import Users.User.User;
+import Users.UsersController;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -21,10 +23,14 @@ import java.util.stream.Collectors;
 public class Main {
     static User user;
     static FlightsService flightsService = new FlightsService();
+    static UsersController usersController = new UsersController();
+    static BookingController bookingController = new BookingController();
     static Console console = new RunnableConsole(Main::getCallbacks);
 
     public static void onStart() throws IOException, ClassNotFoundException {
         flightsService.initializeDb();
+        usersController.initializeDb();
+        bookingController.initializeDb();
     }
 
     public static void showSchedule(Console console) {
@@ -92,9 +98,24 @@ public class Main {
             console.println("Incorrect flight ID!");
             return;
         }
-        console.println(flight.get().toString());
+        Flight bookedFight = flight.get();
 
-        // TODO: Add booking
+
+        List<Ticket> bookingTickets = new ArrayList<>();
+        for (int i = 1; i <= peoplesCount; i++) {
+            Ticket ticket = new Ticket(user, bookedFight);
+            user.addTicket(ticket);
+            bookedFight.addTicket(ticket);
+            bookingTickets.add(ticket);
+        }
+        bookedFight.setPlaces(bookedFight.getPlaces() - peoplesCount);
+
+        try {
+            bookingController.add(bookingTickets);
+            console.println(String.format("Congratulations ! You have booked %d ticket%c!", peoplesCount, peoplesCount > 1 ? 's' : ' '));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static boolean isAuthenticated() {
@@ -102,8 +123,23 @@ public class Main {
     }
 
     public static void loginCallback(Console console) {
-        user = new User("Name", "Surname", "login", "password");
-        console.println("Shadow logged...");
+        String login = getValue(console, "enter your login");
+        String password = getValue(console, "enter your password", s -> s.length() != 0, "password length should me greater than zero");
+        List<User> allUsers = usersController.getAllUsers();
+        Optional<User> first = allUsers.stream().filter(x -> x.login.equals(login)).findFirst();
+        if (first.isPresent()) {
+            boolean isUser = first.get().checkUser(login, password);
+            if (isUser) {
+                console.println("Shadow logged...");
+                user = new User("Name", "Surname", "login", "password");
+            } else {
+                console.println("Wrong password !");
+                logoutCallback(console);
+            }
+        } else {
+            console.println("Wrong login !");
+            logoutCallback(console);
+        }
     }
 
     public static void logoutCallback(Console console) {
@@ -126,6 +162,10 @@ public class Main {
         String password = getValue(console, "enter your password", s -> s.length() > 6, "password length should me greater than 6");
 
         user = new User(name, surname, login, password);
+        try {
+            usersController.addUser(user);
+        } catch (IOException e) {
+        }
         console.println(String.format("User is registered! Hello, @%s", user.login));
     }
 
@@ -137,7 +177,13 @@ public class Main {
         console.println("Your tickets:");
         displayMyFlightsCallback(console);
 
-        String flight_id = getValue(console, "enter flight id");
+        String ticketNumber = getValue(console, "enter ticket number", n -> bookingController.getAll().stream().anyMatch(t -> t.ticketNumber.equals(n)), "enter the valid ticket number");
+        try {
+            bookingController.remove(ticketNumber);
+            user.tickets.removeIf(x -> x.ticketNumber.equals(ticketNumber));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static ArrayList<Callback> getCallbacks() {
@@ -166,6 +212,7 @@ public class Main {
     public static void onClose() {
 
     }
+
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         onStart();

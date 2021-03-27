@@ -52,9 +52,11 @@ public class TestBookingController {
     public void addListTicket() throws IOException {
         User newTestUser = new User("test1", "test1", "test1", "112345");
         Flight newTestFlight = FlightsGenerator.generateFlights(1).get(0);
+        Ticket newTestTicket = new Ticket(newTestUser, newTestFlight);
+        newTestUser.addTicket(newTestTicket);
         List<Ticket> tickets1 = new ArrayList<Ticket>(){{
             add(ticket);
-            add(new Ticket(newTestUser, newTestFlight));
+            add(newTestTicket);
         }};
         controller.add(tickets1);
         tickets = controller.getAll();
@@ -63,7 +65,10 @@ public class TestBookingController {
         tickets = controller.getAll();
         tickets1.remove(ticket);
         assertArrayEquals(tickets.toArray(), tickets1.toArray());
-        controller.remove(newTestUser.login + newTestFlight.getNumber() + newTestFlight.getDate().toLocalDate().toString());
+        String flightNumber = newTestUser.login + newTestUser.getAllTickets().size() + newTestFlight.getNumber() + newTestFlight.getDate().toLocalDate().toString();
+        controller.remove(flightNumber);
+        System.out.println(flightNumber);
+        System.out.println(newTestTicket.ticketNumber);
         tickets1.clear();
         tickets = controller.getAll();
         assertEquals(tickets.size(), 0);

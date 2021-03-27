@@ -1,3 +1,4 @@
+import Booking.Ticket;
 import Flights.Flight.Flight;
 import Flights.FlightsGenerator;
 import Users.User.User;
@@ -10,8 +11,9 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestFlight {
-    private  Flight flight = FlightsGenerator.generateFlights(1).get(0);
+    private Flight flight = FlightsGenerator.generateFlights(1).get(0);
     private User user = new User("test", "test", "test", "12345");
+    private final Ticket testTicket = new Ticket(user, flight);
 
 
     @BeforeEach
@@ -22,7 +24,7 @@ public class TestFlight {
     @Test
     public void addUser(){
         int oldPlaces = flight.getPlaces();
-        flight.addUser(user);
+        flight.addTicket(testTicket);
         int newPlaces = flight.getPlaces();
         assertEquals(oldPlaces, newPlaces + 1);
     }
@@ -30,12 +32,12 @@ public class TestFlight {
     @Test
     public void removeUser(){
         int oldPlaces = flight.getPlaces();
-        flight.addUser(user);
-        flight.removeUser(user);
+        flight.addTicket(testTicket);
+        flight.removeTicket(testTicket);
         int newPlaces = flight.getPlaces();
         assertEquals(oldPlaces, newPlaces);
-        flight.addUser(user);
-        flight.removeUser(user.login);
+        flight.addTicket(testTicket);
+        flight.removeTicket(testTicket.ticketNumber);
         int anotherNewPlaces = flight.getPlaces();
         assertEquals(newPlaces, anotherNewPlaces);
     }
