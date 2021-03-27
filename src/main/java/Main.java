@@ -1,7 +1,6 @@
 import Booking.Ticket;
 import Console.Callback;
 import Console.Console;
-import Console.ExitCallback;
 import Console.RunnableConsole;
 import Flights.Flight.Flight;
 import Flights.FlightsService;
@@ -22,6 +21,13 @@ public class Main {
     static User user;
     static FlightsService flightsService = new FlightsService();
     static Console console = new RunnableConsole(Main::getCallbacks);
+
+    static Callback exitCallback = new Callback("Exit", Main::exitCallbackRunner);
+
+    public static void exitCallbackRunner(Console console) {
+        console.println("Good bye!");
+        console.prepareToExit();
+    }
 
     public static void onStart() throws IOException, ClassNotFoundException {
         flightsService.initializeDb();
@@ -154,7 +160,7 @@ public class Main {
             callbacks.add(new Callback("Display my flights", Main::displayMyFlightsCallback));
             callbacks.add(new Callback("Logout", Main::logoutCallback));
         }
-        callbacks.add(new ExitCallback());
+        callbacks.add(exitCallback);
 
         return callbacks;
     }
