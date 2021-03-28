@@ -14,4 +14,5 @@ public class Schedule {
                 new String(new char[9]).replace('\0', ' '));
         flights.forEach(System.out::println);
     }
+
 }

@@ -2,16 +2,16 @@ package Users.User;
 
 import Booking.Ticket;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class User {
-    public final String name;
-    public final String surname;
-    public final String login;
-    private final String password;
+public class User implements Serializable {
+    public  String name;
+    public  String surname;
+    public  String login;
+    private String password;
     public final List<Ticket> tickets = new ArrayList<>();
-    public boolean isAuth = false;
 
     public User(String name, String surname, String login, String password) {
         this.name = name;
@@ -24,7 +24,6 @@ public class User {
     public boolean checkUser(String login, String password){
         boolean check = login.equals(this.login) && password.equals(this.password);
         if (check){
-            setIsAuth();
             return true;
         }
         return false;
@@ -42,14 +41,6 @@ public class User {
         return tickets;
     }
 
-    public void setIsAuth(){
-        isAuth = true;
-    }
-
-    public void logout(){
-        isAuth = false;
-    }
-
     @Override
     public String toString(){
         return String.format("User name -> %s, user surname -> %s, user login -> %s", name, surname, login);
@@ -64,7 +55,6 @@ public class User {
                 this.surname.equals(user.surname) &&
                 this.login.equals(user.login) &&
                 this.password.equals(user.password) &&
-                this.isAuth == user.isAuth &&
                 this.tickets.equals(user.tickets);
     }
 }
