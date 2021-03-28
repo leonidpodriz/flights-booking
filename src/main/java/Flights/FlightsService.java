@@ -85,6 +85,7 @@ public class FlightsService implements DAO{
     @Override
     public boolean update(String id, Flight flight) {
         if (db.containsKey(id)) {
+            db.remove(id);
             save(flight);
             return true;
         }

@@ -1,5 +1,6 @@
 package Flights.Flight;
 
+import Booking.Ticket;
 import Users.User.User;
 
 import java.io.Serializable;
@@ -18,7 +19,7 @@ public class Flight implements Serializable {
     private final Departures depart;
     private final Destinations dest;
     private int places;
-    private final List<User> users = new ArrayList<>();
+    private final List<Ticket> tickets = new ArrayList<>();
 
     public Flight(String number, LocalDateTime date, Departures depart, Destinations dest, int places) {
         this.number = number;
@@ -26,6 +27,20 @@ public class Flight implements Serializable {
         this.depart = depart;
         this.dest = dest;
         this.places = places;
+    }
+
+
+    public void addTicket(Ticket ticket){
+        tickets.add(ticket);
+        places--;
+    }
+
+    public void removeTicket(Ticket ticket){
+        if (tickets.remove(ticket)) places++;
+    }
+
+    public void removeTicket(String number){
+        if (tickets.removeIf(x -> x.ticketNumber.equals(number))) places++;
     }
 
 
@@ -42,6 +57,8 @@ public class Flight implements Serializable {
     }
 
     public Destinations getDest() { return dest; }
+
+    public Departures getDepart(){return depart;}
 
     public int getPlaces() {
         return places;
@@ -77,6 +94,6 @@ public class Flight implements Serializable {
         if (this.places != f.places) return false;
         return this.getNumber().equals(f.getNumber()) &&
                 this.getDate().toString().equals(f.getDate().toString()) &&
-                this.getDest().name().equals(f.getDest().name());
+                this.getDest().name().equals(f.getDest().name()) && tickets.equals(f.tickets);
     }
 }

@@ -5,15 +5,26 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class RunnableConsole implements Console {
-    final List<Callback> callbackList;
+    List<Callback> callbackList;
+    Supplier<List<Callback>> callbackSupplier;
     final PrintStream out = System.out;
     private boolean exit = false;
     Scanner scanner = new Scanner(System.in);
 
     public RunnableConsole(Callback... callbacks) {
-        callbackList = Arrays.asList(callbacks);
+        this.callbackList = Arrays.asList(callbacks);
+        callbackSupplier = this::getStaticCallbacks;
+    }
+
+    public RunnableConsole(Supplier<List<Callback>> callbackSupplier) {
+        this.callbackSupplier = callbackSupplier;
+    }
+
+    private List<Callback> getStaticCallbacks() {
+        return callbackList;
     }
 
     @Override
@@ -38,16 +49,20 @@ public class RunnableConsole implements Console {
         print(">>> ");
     }
 
+    public void println(String text) {
+        print(String.format("%s\n", text));
+    }
+
     private void printBreak() {
         print("---\n");
     }
 
     private boolean isChoiceValid(int choice) {
-        return choice <= callbackList.size() && choice > 0;
+        return choice <= callbackSupplier.get().size() && choice > 0;
     }
 
     private String getExpectedChoice() {
-        return String.format("integer between %d and %d", 1, callbackList.size());
+        return String.format("integer between %d and %d", 1, callbackSupplier.get().size());
     }
 
     private void printMe() {
@@ -103,7 +118,7 @@ public class RunnableConsole implements Console {
 
         while (!exit) {
             printMe();
-            callbackList.get(readChoice() - 1).run(this);
+            callbackSupplier.get().get(readChoice() - 1).run(this);
             printBreak();
         }
     }
@@ -111,8 +126,10 @@ public class RunnableConsole implements Console {
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < callbackList.size(); i++) {
-            Callback callback = callbackList.get(i);
+        List<Callback> callbacks = callbackSupplier.get();
+
+        for (int i = 0; i < callbacks.size(); i++) {
+            Callback callback = callbacks.get(i);
             stringBuilder.append(String.format("%2d) %s\n", i + 1, callback));
         }
 
