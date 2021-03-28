@@ -1,16 +1,16 @@
-import Flights.Flight.Flight;
-import Flights.FlightController;
+package Flights;
 
-import Flights.FlightsGenerator;
+import Flights.Flight.Flight;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestFlightsController {
+public class FlightsControllerTest {
     private final FlightController controller = new FlightController();
     private List<Flight> flights;
 
@@ -33,7 +33,13 @@ public class TestFlightsController {
     @Test
     public void getFlight() {
         Flight firstFlight = flights.get(0);
-        assertEquals(controller.get(firstFlight.getNumber()).get(), firstFlight);
+        String number = firstFlight.getNumber();
+        Optional<Flight> flight = controller.get(number);
+
+        boolean isFlightPresent = flight.isPresent();
+
+        assertTrue(isFlightPresent);
+        assertEquals(flight.get(), firstFlight);
     }
 
     @Test

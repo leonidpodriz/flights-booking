@@ -1,3 +1,5 @@
+package Flights.Flight;
+
 import Booking.Ticket;
 import Flights.Flight.Flight;
 import Flights.FlightsGenerator;
@@ -5,24 +7,23 @@ import Users.User.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestFlight {
+public class FlightTest {
     private Flight flight = FlightsGenerator.generateFlights(1).get(0);
-    private User user = new User("test", "test", "test", "12345");
+    private final User user = new User("test", "test", "test", "12345");
     private final Ticket testTicket = new Ticket(user, flight);
 
 
     @BeforeEach
-    public void regenerateFlight(){
+    public void regenerateFlight() {
         flight = FlightsGenerator.generateFlights(1).get(0);
     }
 
     @Test
-    public void addUser(){
+    public void addUser() {
         int oldPlaces = flight.getPlaces();
         flight.addTicket(testTicket);
         int newPlaces = flight.getPlaces();
@@ -30,7 +31,7 @@ public class TestFlight {
     }
 
     @Test
-    public void removeUser(){
+    public void removeUser() {
         int oldPlaces = flight.getPlaces();
         flight.addTicket(testTicket);
         flight.removeTicket(testTicket);
@@ -43,21 +44,21 @@ public class TestFlight {
     }
 
     @Test
-    public void setDate(){
+    public void setDate() {
         LocalDateTime dateTime = LocalDateTime.now();
         flight.setDate(dateTime);
         assertEquals(flight.getDate(), dateTime);
     }
 
     @Test
-    public void setPlaces(){
+    public void setPlaces() {
         int newPlaces = 100000;
         flight.setPlaces(newPlaces);
         assertEquals(flight.getPlaces(), newPlaces);
     }
 
     @Test
-    public void equals(){
+    public void equals() {
         Flight testFlight = new Flight(flight.getNumber(), flight.getDate(), flight.getDepart(), flight.getDest(), flight.getPlaces());
         assertEquals(flight, testFlight);
     }

@@ -1,16 +1,20 @@
+package Users;
 
 import Users.User.User;
-import Users.UsersController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
 import java.io.IOException;
 import java.util.List;
 
-public class TestUserController {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class UsersControllerTest {
     private final UsersController controller = new UsersController();
     private final User user = new User("test", "test", "test", "12345");
     private List<User> users;
+
     @BeforeEach
     public void generate() throws IOException, ClassNotFoundException {
         controller.initializeDb();

@@ -1,6 +1,6 @@
+package Booking;
 
-import Booking.BookingController;
-import Booking.Ticket;
+
 import Flights.Flight.Flight;
 import Flights.FlightsGenerator;
 import Users.User.User;
@@ -11,9 +11,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestBookingController {
+public class BookingControllerTest {
     private final BookingController controller = new BookingController();
     private final User user = new User("test", "test", "test", "12345");
     private final Flight flight = FlightsGenerator.generateFlights(1).get(0);
@@ -27,7 +28,7 @@ public class TestBookingController {
     }
 
     @Test
-    public void generationCheck(){
+    public void generationCheck() {
         assertEquals(tickets.size(), 0);
     }
 
@@ -54,7 +55,7 @@ public class TestBookingController {
         Flight newTestFlight = FlightsGenerator.generateFlights(1).get(0);
         Ticket newTestTicket = new Ticket(newTestUser, newTestFlight);
         newTestUser.addTicket(newTestTicket);
-        List<Ticket> tickets1 = new ArrayList<Ticket>(){{
+        List<Ticket> tickets1 = new ArrayList<Ticket>() {{
             add(ticket);
             add(newTestTicket);
         }};
