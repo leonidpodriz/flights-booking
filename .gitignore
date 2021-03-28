@@ -27,4 +27,4 @@ flights-booking.iml
 .DS_Store
 
 
-**/db.bin
+**/*.bin
