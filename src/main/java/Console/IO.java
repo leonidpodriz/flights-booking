@@ -2,7 +2,6 @@ package Console;
 
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.function.Predicate;
