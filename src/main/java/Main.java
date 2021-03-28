@@ -119,7 +119,7 @@ public class Main {
 
         try {
             bookingController.add(bookingTickets);
-            console.println(String.format("Congratulations ! You have booked %d ticket%c!", peoplesCount, peoplesCount > 1 ? 's' : ' '));
+            console.printLine(String.format("Congratulations ! You have booked %d ticket%c!", peoplesCount, peoplesCount > 1 ? 's' : ' '));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -137,14 +137,14 @@ public class Main {
         if (first.isPresent()) {
             boolean isUser = first.get().checkUser(login, password);
             if (isUser) {
-                console.println("Shadow logged...");
+                console.printLine("Shadow logged...");
                 user = new User("Name", "Surname", "login", "password");
             } else {
-                console.println("Wrong password !");
+                console.printLine("Wrong password !");
                 logoutCallback(console);
             }
         } else {
-            console.println("Wrong login !");
+            console.printLine("Wrong login !");
             logoutCallback(console);
         }
     }
@@ -171,9 +171,10 @@ public class Main {
         user = new User(name, surname, login, password);
         try {
             usersController.addUser(user);
+            console.printLine(String.format("User is registered! Hello, @%s", user.login));
         } catch (IOException e) {
+            console.printLine("Something went wrong...");
         }
-        console.println(String.format("User is registered! Hello, @%s", user.login));
     }
 
     public static void displayMyFlightsCallback(Console console) {
