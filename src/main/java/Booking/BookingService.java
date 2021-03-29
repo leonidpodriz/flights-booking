@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class BookingService implements DAO{
-    private final File dbDir = new File("src/db");
-    private final File dbFile = new File("src/db/tickets.bin");
+public class BookingService implements DAO {
+    private final File dbDir = new File("db");
+    private final File dbFile = new File("db/tickets.bin");
     private final List<Ticket> tickets = new ArrayList<>();
 
     public void initializeDb() throws IOException, ClassNotFoundException {
@@ -18,7 +18,7 @@ public class BookingService implements DAO{
             writeList();
         } else {
             if (dbFile.exists()) {
-                tickets.addAll(readUsers());
+                tickets.addAll(readTickets());
             } else {
                 boolean newFile = dbFile.createNewFile();
                 writeList();
@@ -26,18 +26,19 @@ public class BookingService implements DAO{
         }
     }
 
-    private List<Ticket> readUsers() throws IOException, ClassNotFoundException {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(dbFile))) {
-            return (ArrayList<Ticket>) ois.readObject();
-        }
+    private List<Ticket> readTickets() throws IOException, ClassNotFoundException {
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(dbFile));
+        ArrayList<Ticket> tickets = (ArrayList<Ticket>) ois.readObject();
+        ois.close();
+        return tickets;
     }
 
     private void writeList() throws IOException {
         dbFile.delete();
         dbFile.createNewFile();
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(dbFile))) {
-            oos.writeObject(tickets);
-        }
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(dbFile));
+        oos.writeObject(tickets);
+        oos.close();
     }
 
     @Override
@@ -47,7 +48,7 @@ public class BookingService implements DAO{
 
     @Override
     public Optional<Ticket> get(String number) {
-        return tickets.stream().filter(x ->x.ticketNumber.equals(number)).findFirst();
+        return tickets.stream().filter(x -> x.ticketNumber.equals(number)).findFirst();
     }
 
     @Override
@@ -72,7 +73,7 @@ public class BookingService implements DAO{
 
     @Override
     public boolean remove(Ticket ticket) throws IOException {
-        boolean check =  tickets.remove(ticket);
+        boolean check = tickets.remove(ticket);
         if (check) writeList();
         return check;
     }
