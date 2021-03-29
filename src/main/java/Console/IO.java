@@ -8,17 +8,12 @@ import java.util.function.Predicate;
 
 public class IO {
     private final PrintStream out;
-    private final InputStream in;
     private final Scanner scanner;
     private final String consolePrefix;
 
-    enum MessageType {
-        INFO, WARNING, ERROR
-    }
-
+    enum MessageType {INFO, WARNING, ERROR}
     public IO(PrintStream out, InputStream in, String consolePrefix) {
         this.out = out;
-        this.in = in;
         this.scanner = new Scanner(in);
         this.consolePrefix = consolePrefix;
     }
@@ -26,49 +21,31 @@ public class IO {
     public IO(PrintStream out, InputStream in) {
         this(out, in, ">>> ");
     }
-
     public IO() {
         this(System.out, System.in);
     }
-
     public void printString(String string) {
         out.print(string);
     }
-
     private void printConsolePrefix() {
         printString(consolePrefix);
     }
-
     public void printMessage(MessageType type, String message) {
         printLine(String.format("%s: %s", type.name(), message));
     }
-
     public void printError(String errorMessage) {
         printMessage(MessageType.ERROR, errorMessage);
     }
-
     public void printConditionError(Object value, String condition) {
         printError(String.format("The value (%s) is mismatching next condition: %s", value.toString(), condition));
     }
-
     public void printLine(String string) {
         printString(String.format("%s\n", string));
     }
-
     public String readString() {
         printConsolePrefix();
         return scanner.next();
     }
-
-    public <T> boolean testPredicate(Predicate<T> predicate, T value, String predicateCondition) {
-        if (predicate.test(value)) {
-            return true;
-        } else {
-            printConditionError(value, predicateCondition);
-        }
-        return false;
-    }
-
     public String readString(Predicate<String> predicate, String predicateCondition) {
         String string;
 
@@ -83,12 +60,10 @@ public class IO {
 
         return string;
     }
-
     public int readInt() throws InputMismatchException {
         printConsolePrefix();
         return scanner.nextInt();
     }
-
     public int readInt(String errorMessage) {
         Integer number = null;
 
@@ -96,6 +71,7 @@ public class IO {
             try {
                 number = readInt();
             } catch (InputMismatchException e) {
+                readString();
                 printError(errorMessage);
             }
         }
