@@ -20,7 +20,7 @@ public class FlightController {
 
     public List<Flight> getAll(){ return service.getAll(); }
 
-    public boolean update(String id, Flight flight){ return service.update(id, flight);}
+    public boolean update(String id, Flight flight) throws IOException { return service.update(id, flight);}
 
 
 }

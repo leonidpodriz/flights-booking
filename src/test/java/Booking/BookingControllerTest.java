@@ -27,53 +27,52 @@ public class BookingControllerTest {
         tickets = controller.getAll();
     }
 
-    @Test
-    public void generationCheck() {
-        assertEquals(tickets.size(), 0);
-    }
+
 
     @Test
     public void addTicket() throws IOException {
+        int oldSize = controller.getAll().size();
         controller.add(ticket);
-        tickets = controller.getAll();
-        assertEquals(tickets.size(), 1);
-        assertEquals(tickets.get(0), ticket);
+        assertEquals(oldSize + 1, controller.getAll().size());
+        assertEquals(tickets.get(oldSize), ticket);
         controller.remove(ticket);
     }
 
     @Test
     public void removeTicket() throws IOException {
+        int oldSize = controller.getAll().size();
         controller.add(ticket);
+        assertEquals(oldSize + 1, controller.getAll().size());
         controller.remove(ticket);
-        tickets = controller.getAll();
-        assertEquals(tickets.size(), 0);
+        assertEquals(oldSize, controller.getAll().size());
     }
 
     @Test
     public void addListTicket() throws IOException {
+        int oldSize = controller.getAll().size();
         User newTestUser = new User("test1", "test1", "test1", "112345");
         Flight newTestFlight = FlightsGenerator.generateFlights(1).get(0);
         Ticket newTestTicket = new Ticket(newTestUser, newTestFlight);
         newTestUser.addTicket(newTestTicket);
-        List<Ticket> tickets1 = new ArrayList<Ticket>() {{
+        List<Ticket> futureTickets = new ArrayList<Ticket>() {{
+            addAll(controller.getAll());
             add(ticket);
             add(newTestTicket);
         }};
-        controller.add(tickets1);
-        tickets = controller.getAll();
-        assertArrayEquals(tickets.toArray(), tickets1.toArray());
+
+        List<Ticket> testTickets = new ArrayList<Ticket>(){{
+            add(ticket);
+            add(newTestTicket);
+        }};
+        controller.add(testTickets);
+        assertArrayEquals(controller.getAll().toArray(), futureTickets.toArray());
         controller.remove(ticket);
-        tickets = controller.getAll();
-        tickets1.remove(ticket);
-        assertArrayEquals(tickets.toArray(), tickets1.toArray());
+        futureTickets.remove(ticket);
+        assertArrayEquals(controller.getAll().toArray(), futureTickets.toArray());
         String flightNumber = newTestUser.login + newTestUser.getAllTickets().size() + newTestFlight.getNumber() + newTestFlight.getDate().toLocalDate().toString();
         controller.remove(flightNumber);
-        System.out.println(flightNumber);
-        System.out.println(newTestTicket.ticketNumber);
-        tickets1.clear();
-        tickets = controller.getAll();
-        assertEquals(tickets.size(), 0);
-        assertArrayEquals(tickets.toArray(), tickets1.toArray());
-
+        futureTickets.remove(newTestTicket);
+        assertEquals(oldSize, controller.getAll().size());
+        assertArrayEquals(controller.getAll().toArray(), futureTickets.toArray());
     }
 }

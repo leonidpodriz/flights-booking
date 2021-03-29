@@ -24,30 +24,31 @@ public class UsersControllerTest {
 
     @Test
     public void addUser() throws IOException {
+        int oldSize = controller.getAllUsers().size();
         controller.addUser(user);
         users = controller.getAllUsers();
-        assertEquals(users.size(), 1);
-        assertEquals(users.get(0), user);
+        assertEquals(++oldSize, users.size());
+        assertEquals(users.get(oldSize - 1), user);
     }
 
     @Test
     public void removeUser() throws IOException {
+        int oldSize = controller.getAllUsers().size();
         controller.addUser(user);
+        assertEquals(oldSize + 1, users.size());
         controller.remove(user);
         users = controller.getAllUsers();
-        assertEquals(users.size(), 0);
-        controller.addUser(user);
-        controller.remove(user.name);
-        assertEquals(users.size(), 0);
+        assertEquals(oldSize, users.size());
     }
 
     @Test
     public void update() throws IOException {
         controller.addUser(user);
+        int oldSize = controller.getAllUsers().size();
         User newUser = new User("test1", "test1", "test1", "test");
         controller.update(user.login, newUser);
         users = controller.getAllUsers();
-        assertEquals(users.size(), 1);
+        assertEquals(oldSize, users.size());
         assertTrue(users.contains(newUser));
         controller.remove(newUser);
     }

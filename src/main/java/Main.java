@@ -1,13 +1,10 @@
-import Booking.BookingController;
 import Booking.Ticket;
 import Console.Callback;
 import Console.Console;
 import Console.RunnableConsole;
 import Flights.Flight.Flight;
-import Flights.FlightsService;
 import Schedule.Schedule;
 import Users.User.User;
-import Users.UsersController;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -21,9 +18,7 @@ import java.util.stream.Collectors;
 
 public class Main {
     static User user;
-    static FlightsService flightsService = new FlightsService();
-    static UsersController usersController = new UsersController();
-    static BookingController bookingController = new BookingController();
+    static MainController mainController = new MainController();
     static Console console = new RunnableConsole(Main::getCallbacks);
 
     static Callback exitCallback = new Callback("Exit", Main::exitCallbackRunner);
@@ -34,19 +29,17 @@ public class Main {
     }
 
     public static void onStart() throws IOException, ClassNotFoundException {
-        flightsService.initializeDb();
-        usersController.initializeDb();
-        bookingController.initializeDb();
+        mainController.initializeDb();
     }
 
     public static void showSchedule(Console console) {
-        Schedule.showFlights(flightsService.getAll());
+        Schedule.showFlights(mainController.flightController.getAll());
     }
 
     public static void showFlightInformation(Console console) {
         console.print("Enter flight ID:\n");
         String flightID = console.readString();
-        Optional<Flight> flightObj = flightsService.get(flightID);
+        Optional<Flight> flightObj = mainController.flightController.get(flightID);
         if (flightObj.isPresent()) {
             Flight flight = flightObj.get();
             console.print(String.format(
@@ -59,7 +52,7 @@ public class Main {
     }
 
     public static void searchAndBookFlight(Console console) {
-        List<Flight> allFlights = flightsService.getAll();
+        List<Flight> allFlights = mainController.flightController.getAll();
         List<String> possibleDestination = allFlights.stream().map(f -> f.getDest().name().toLowerCase()).collect(Collectors.toList());
 
         console.printLine("Enter destination:");
@@ -84,7 +77,7 @@ public class Main {
         console.printLine("Enter peoples count:");
         int peoplesCount = console.readInt();
 
-        String searchResult = flightsService.getAll()
+        String searchResult = mainController.flightController.getAll()
                 .stream()
                 .filter(f -> f.getDest().name().equalsIgnoreCase(destination) && f.getPlaces() >= peoplesCount && f.getDate().toLocalDate().equals(date))
                 .map(Flight::toString)
@@ -98,7 +91,7 @@ public class Main {
         console.printLine(searchResult);
         console.printLine("Enter flight ID:");
         String flight_id = console.readString();
-        Optional<Flight> flight = flightsService.get(flight_id);
+        Optional<Flight> flight = mainController.flightController.get(flight_id);
 
         if (!flight.isPresent()) {
             console.printLine("Incorrect flight ID!");
@@ -106,19 +99,21 @@ public class Main {
         }
         console.printLine(flight.get().toString());
         Flight bookedFight = flight.get();
-
-
         List<Ticket> bookingTickets = new ArrayList<>();
         for (int i = 1; i <= peoplesCount; i++) {
             Ticket ticket = new Ticket(user, bookedFight);
             user.addTicket(ticket);
             bookedFight.addTicket(ticket);
+            try {
+                mainController.flightController.update(bookedFight.getNumber(), bookedFight);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             bookingTickets.add(ticket);
         }
-        bookedFight.setPlaces(bookedFight.getPlaces() - peoplesCount);
 
         try {
-            bookingController.add(bookingTickets);
+            mainController.bookingController.add(bookingTickets);
             console.printLine(String.format("Congratulations ! You have booked %d ticket%c!", peoplesCount, peoplesCount > 1 ? 's' : ' '));
         } catch (IOException e) {
             e.printStackTrace();
@@ -132,13 +127,19 @@ public class Main {
     public static void loginCallback(Console console) {
         String login = getValue(console, "enter your login");
         String password = getValue(console, "enter your password", s -> s.length() != 0, "password length should me greater than zero");
-        List<User> allUsers = usersController.getAllUsers();
+        List<User> allUsers = mainController.usersController.getAllUsers();
         Optional<User> first = allUsers.stream().filter(x -> x.login.equals(login)).findFirst();
         if (first.isPresent()) {
             boolean isUser = first.get().checkUser(login, password);
             if (isUser) {
                 console.printLine("Shadow logged...");
-                user = new User("Name", "Surname", "login", "password");
+                user = first.get();
+                mainController.bookingController.getAll().forEach(x -> {
+                    if (x.user.equals(user)){
+                        user.addTicket(x);
+                        System.out.println("HEllo");
+                    }
+                });
             } else {
                 console.printLine("Wrong password !");
                 logoutCallback(console);
@@ -165,12 +166,13 @@ public class Main {
     public static void registerCallback(Console console) {
         String name = getValue(console, "enter your name");
         String surname = getValue(console, "enter your surname");
-        String login = getValue(console, "enter your login");
+        String login = getValue(console, "enter your login", s -> mainController.usersController
+                .getAllUsers().stream().noneMatch(x -> x.login.equals(s)), "this login is already exist");
         String password = getValue(console, "enter your password", s -> s.length() > 6, "password length should me greater than 6");
 
         user = new User(name, surname, login, password);
         try {
-            usersController.addUser(user);
+            mainController.usersController.addUser(user);
             console.printLine(String.format("User is registered! Hello, @%s", user.login));
         } catch (IOException e) {
             console.printLine("Something went wrong...");
@@ -185,9 +187,13 @@ public class Main {
         console.printLine("Your tickets:");
         displayMyFlightsCallback(console);
 
-        String ticketNumber = getValue(console, "enter ticket number", n -> bookingController.getAll().stream().anyMatch(t -> t.ticketNumber.equals(n)), "enter the valid ticket number");
+        String ticketNumber = getValue(console, "enter ticket number", n -> mainController.bookingController.getAll().stream().anyMatch(t -> t.ticketNumber.equals(n)), "enter the valid ticket number");
         try {
-            bookingController.remove(ticketNumber);
+            Ticket ticket = mainController.bookingController.get(ticketNumber).get();
+            mainController.bookingController.remove(ticketNumber);
+            ticket.flight.removeTicket(ticketNumber);
+            Flight flight = ticket.flight;
+            mainController.flightController.update(flight.getNumber(), flight);
             user.tickets.removeIf(x -> x.ticketNumber.equals(ticketNumber));
         } catch (IOException e) {
             e.printStackTrace();

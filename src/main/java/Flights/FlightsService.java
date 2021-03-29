@@ -15,61 +15,56 @@ import java.util.Map;
 import java.util.Optional;
 
 
-public class FlightsService implements DAO{
+public class FlightsService implements DAO {
 
     private final Map<String, Flight> db = new HashMap<>();
 
-    private final int flightsQuantity = 500;
+    private final File dbDir = new File("db");
+    private final File dbFile = new File("db/db.bin");
 
     public void initializeDb() throws IOException, ClassNotFoundException {
-
-        File dbDir = new File("src/db");
-        File dbFile = new File("src/db/db.bin");
-
         boolean mkdir = dbDir.mkdir();
-
         if (mkdir) {
             boolean newFile = dbFile.createNewFile();
-            generateAndWriteFlights(db, dbFile);
+            generateAndWriteFlights();
         } else {
             if (dbFile.exists()) {
-                readFlights(db, dbFile);
+                readFlights();
             } else {
                 boolean newFile = dbFile.createNewFile();
-                generateAndWriteFlights(db, dbFile);
+                generateAndWriteFlights();
             }
         }
     }
 
     private List<Flight> generateFlights() {
-        return FlightsGenerator.generateFlights(flightsQuantity);
+        return FlightsGenerator.generateFlights(500);
     }
 
-    private void generateAndWriteFlights(Map<String, Flight> db, File file) throws IOException {
+    private void generateAndWriteFlights() throws IOException {
         List<Flight> flights = generateFlights();
         flights.forEach(x -> db.put(x.getNumber(), x));
-        writeFLights(flights, file);
+        writeFLights();
     }
 
-    private void writeFLights(List<Flight> flights, File file) throws IOException {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
-            for (Flight flight : flights) {
-                oos.writeObject(flight);
-            }
-        }
+    private void writeFLights() throws IOException {
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(dbFile));
+        oos.writeObject(db);
     }
 
-    private void readFlights(Map<String, Flight> flights, File file) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-            for (int i = 1; i <= flightsQuantity; i++) {
-                Flight flight = (Flight) ois.readObject();
-                flights.put(flight.getNumber(), flight);
-            }
-        }
+    private void readFlights() throws IOException, ClassNotFoundException {
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(dbFile));
+        HashMap<String, Flight> fileDb = (HashMap<String, Flight>) ois.readObject();
+        ois.close();
+        fileDb.forEach(db::put);
+
     }
 
-    private void save(Flight flight) {
+    private void save(Flight flight) throws IOException {
         db.put(flight.getNumber(), flight);
+        dbFile.delete();
+        dbFile.createNewFile();
+        writeFLights();
     }
 
     @Override
@@ -83,9 +78,8 @@ public class FlightsService implements DAO{
     }
 
     @Override
-    public boolean update(String id, Flight flight) {
+    public boolean update(String id, Flight flight) throws IOException {
         if (db.containsKey(id)) {
-            db.remove(id);
             save(flight);
             return true;
         }
