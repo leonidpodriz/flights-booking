@@ -51,10 +51,5 @@ public class User implements Serializable {
         if (this == o) return true;
         if (!(o instanceof User)) return false;
         User user = (User) o;
-        return this.name.equals(user.name) &&
-                this.surname.equals(user.surname) &&
-                this.login.equals(user.login) &&
-                this.password.equals(user.password) &&
-                this.tickets.equals(user.tickets);
-    }
+        return this.login.equals(user.login);}
 }

@@ -1,6 +1,7 @@
 package Flights.Flight;
 
 import Booking.Ticket;
+import Flights.FlightController;
 import Users.User.User;
 
 import java.io.Serializable;
@@ -64,9 +65,6 @@ public class Flight implements Serializable {
         return places;
     }
 
-    public void setPlaces(int places) {
-        this.places = places;
-    }
 
     @Override
     public String toString() {

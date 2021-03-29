@@ -50,12 +50,6 @@ public class FlightTest {
         assertEquals(flight.getDate(), dateTime);
     }
 
-    @Test
-    public void setPlaces() {
-        int newPlaces = 100000;
-        flight.setPlaces(newPlaces);
-        assertEquals(flight.getPlaces(), newPlaces);
-    }
 
     @Test
     public void equals() {

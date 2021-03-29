@@ -1,6 +1,8 @@
 package Flights;
 
+import Booking.Ticket;
 import Flights.Flight.Flight;
+import Users.User.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -25,35 +27,30 @@ public class FlightsControllerTest {
         }
     }
 
-    @Test
-    public void dbGeneration() {
-        assertEquals(flights.size(), 500);
-    }
 
     @Test
     public void getFlight() {
         Flight firstFlight = flights.get(0);
         String number = firstFlight.getNumber();
         Optional<Flight> flight = controller.get(number);
-
         boolean isFlightPresent = flight.isPresent();
-
         assertTrue(isFlightPresent);
         assertEquals(flight.get(), firstFlight);
     }
 
     @Test
-    public void updateFlight() {
-        Flight testFlight = FlightsGenerator.generateFlights(1).get(0);
-        Flight oldFlight = flights.get(0);
-        String oldFlightNumber = oldFlight.getNumber();
-        boolean update = controller.update(oldFlightNumber, testFlight);
+    public void updateFlight() throws IOException {
+        Flight flight = flights.get(0);
+        final User testUser = new User("test", "test", "test", "12345");
+        final Ticket testTicket = new Ticket(testUser, flight);
+        flight.addTicket(testTicket);
+        boolean update = controller.update(flight.getNumber(), flight);
         assertTrue(update);
-        boolean update2 = controller.update("dasda", testFlight);
+        boolean update2 = controller.update("dasda", flight);
         assertFalse(update2);
         flights = controller.getAll();
-        assertTrue(flights.contains(testFlight));
-        assertFalse(flights.contains(oldFlight));
+        Flight newFlight = flights.get(0);
+        assertTrue(flights.contains(newFlight));
     }
 
 }

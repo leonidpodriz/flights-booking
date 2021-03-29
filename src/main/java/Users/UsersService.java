@@ -7,8 +7,8 @@ import java.util.*;
 
 public class UsersService implements DAO {
 
-    private final File dbDir = new File("src/db");
-    private final File dbFile = new File("src/db/users.bin");
+    private final File dbDir = new File("db");
+    private final File dbFile = new File("db/users.bin");
 
     private final List<User> users = new ArrayList<>();
 
@@ -28,17 +28,18 @@ public class UsersService implements DAO {
     }
 
     private List<User> readUsers() throws IOException, ClassNotFoundException {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(dbFile))) {
-            return (ArrayList<User>) ois.readObject();
-        }
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(dbFile));
+        ArrayList<User> users = (ArrayList<User>) ois.readObject();
+        ois.close();
+        return users;
     }
 
     private void writeList() throws IOException {
         dbFile.delete();
         dbFile.createNewFile();
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(dbFile))) {
-            oos.writeObject(users);
-        }
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(dbFile));
+        oos.writeObject(users);
+        oos.close();
     }
 
     @Override

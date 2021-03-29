@@ -22,4 +22,5 @@ public class UsersController {
     public boolean remove(User user) throws IOException {  return service.remove(user);}
 
     public void addUser(User user) throws IOException { service.addUser(user);}
+
 }
