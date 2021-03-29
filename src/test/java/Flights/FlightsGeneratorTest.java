@@ -1,6 +1,7 @@
+package Flights;
+
 import Flights.Flight.Destinations;
 import Flights.Flight.Flight;
-import Flights.FlightsGenerator;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -9,7 +10,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestFlightsGeneration {
+public class FlightsGeneratorTest {
     @Test
     public void flightsGenerations() {
         final List<Flight> flights = FlightsGenerator.generateFlights(1000);
@@ -26,19 +27,19 @@ public class TestFlightsGeneration {
     }
 
     @Test
-    public void generateDestination(){
+    public void generateDestination() {
         final Destinations destination = FlightsGenerator.generateDestination();
         assertTrue(Arrays.asList(Destinations.destinations).contains(destination));
     }
 
     @Test
-    public void generatePlaces(){
+    public void generatePlaces() {
         final int places = FlightsGenerator.generatePlaces();
         assertTrue(places >= 50 && places <= 200);
     }
 
     @Test
-    public void generateDateTime(){
+    public void generateDateTime() {
         final LocalDateTime dateTime = FlightsGenerator.generateDateTime();
         assertTrue(dateTime.isAfter(LocalDateTime.now()));
     }

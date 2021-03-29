@@ -1,8 +1,5 @@
-package TestConsole;
+package Console;
 
-import Console.Callback;
-import Console.Console;
-import Console.RunnableConsole;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -10,7 +7,7 @@ import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestCallback {
+public class CallbackTest {
 
     @Test
     public void testCallbackWithFulfilledConstructor() {

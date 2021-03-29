@@ -1,103 +1,71 @@
 package Console;
 
-import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public class RunnableConsole implements Console {
-    List<Callback> callbackList;
-    Supplier<List<Callback>> callbackSupplier;
-    final PrintStream out = System.out;
-    private boolean exit = false;
-    Scanner scanner = new Scanner(System.in);
+    final static String INVALID_INTEGER_MESSAGE = "Invalid number. Try again.";
+    final Supplier<List<Callback>> callbackSupplier;
+    final IO io;
 
-    public RunnableConsole(Callback... callbacks) {
-        this.callbackList = Arrays.asList(callbacks);
-        callbackSupplier = this::getStaticCallbacks;
-    }
+    private boolean exit = false;
+
 
     public RunnableConsole(Supplier<List<Callback>> callbackSupplier) {
         this.callbackSupplier = callbackSupplier;
+        io = new IO();
     }
 
-    private List<Callback> getStaticCallbacks() {
-        return callbackList;
+    public RunnableConsole(Callback... callbacks) {
+        this(() -> Arrays.asList(callbacks));
     }
+
 
     @Override
     public void prepareToExit() {
         exit = true;
     }
 
+    public boolean isPreparedToExit() {
+        return exit;
+    }
+
     @Override
     public void print(String text) {
-        out.print(text);
+        io.printString(text);
+    }
+
+    @Override
+    public void printLine(String text) {
+        io.printLine(text);
     }
 
     public void printInvalidValue(String expected) {
-        print(String.format("Invalid value! Expected %s.\n", expected));
-    }
-
-    public void printInvalidChoice() {
-        printInvalidValue(getExpectedChoice());
-    }
-
-    public void printPrompt() {
-        print(">>> ");
-    }
-
-    public void println(String text) {
-        print(String.format("%s\n", text));
-    }
-
-    private void printBreak() {
-        print("---\n");
-    }
-
-    private boolean isChoiceValid(int choice) {
-        return choice <= callbackSupplier.get().size() && choice > 0;
-    }
-
-    private String getExpectedChoice() {
-        return String.format("integer between %d and %d", 1, callbackSupplier.get().size());
-    }
-
-    private void printMe() {
-        print(this.toString());
+        io.printConditionError("Invalid value!", expected);
     }
 
     @Override
     public int readInt() {
-        while (true) {
-            printPrompt();
-            if (scanner.hasNextInt()) {
-                return scanner.nextInt();
-            } else {
-                scanner.next();
-                printInvalidChoice();
-            }
-        }
+        return io.readInt(INVALID_INTEGER_MESSAGE);
+    }
+
+    @Override
+    public int readInt(Predicate<Integer> predicate, String conditionDescription) {
+        return io.readInt(INVALID_INTEGER_MESSAGE, predicate, conditionDescription);
     }
 
     private int readChoice() {
-        int choice;
-
-        while (true) {
-            choice = readInt();
-            if (isChoiceValid(choice)) {
-                return choice;
-            } else {
-                printInvalidChoice();
-            }
-        }
+        return readInt(
+                choice -> choice <= callbackSupplier.get().size() && choice > 0,
+                String.format("Choice number should be between %d and %d", 1, callbackSupplier.get().size())
+        );
     }
 
     @Override
     public String readString() {
-        return scanner.next();
+        return io.readString();
     }
 
     @Override
@@ -115,11 +83,10 @@ public class RunnableConsole implements Console {
 
     @Override
     public void run() {
-
         while (!exit) {
-            printMe();
+            io.printLine(this.toString());
             callbackSupplier.get().get(readChoice() - 1).run(this);
-            printBreak();
+            printLine("---");
         }
     }
 

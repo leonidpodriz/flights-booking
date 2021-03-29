@@ -2,7 +2,6 @@ import Booking.BookingController;
 import Booking.Ticket;
 import Console.Callback;
 import Console.Console;
-import Console.ExitCallback;
 import Console.RunnableConsole;
 import Flights.Flight.Flight;
 import Flights.FlightsService;
@@ -26,6 +25,13 @@ public class Main {
     static UsersController usersController = new UsersController();
     static BookingController bookingController = new BookingController();
     static Console console = new RunnableConsole(Main::getCallbacks);
+
+    static Callback exitCallback = new Callback("Exit", Main::exitCallbackRunner);
+
+    public static void exitCallbackRunner(Console console) {
+        console.printLine("Good bye!");
+        console.prepareToExit();
+    }
 
     public static void onStart() throws IOException, ClassNotFoundException {
         flightsService.initializeDb();
@@ -56,7 +62,7 @@ public class Main {
         List<Flight> allFlights = flightsService.getAll();
         List<String> possibleDestination = allFlights.stream().map(f -> f.getDest().name().toLowerCase()).collect(Collectors.toList());
 
-        console.println("Enter destination:");
+        console.printLine("Enter destination:");
         String destination = console.readString(
                 s -> possibleDestination.contains(s.toLowerCase()),
                 String.format("one of: %s", String.join(", ", possibleDestination)));
@@ -65,7 +71,7 @@ public class Main {
         LocalDate date1 = LocalDate.now();
         do {
             try {
-                console.println("Enter date [MM.dd.yyyy]:");
+                console.printLine("Enter date [MM.dd.yyyy]:");
                 date1 = LocalDate.parse(console.readString(), DateTimeFormatter.ofPattern("MM.dd.yyyy"));
                 isDateInvalid = false;
             } catch (DateTimeParseException e) {
@@ -75,7 +81,7 @@ public class Main {
 
         LocalDate date = date1;
 
-        console.println("Enter peoples count:");
+        console.printLine("Enter peoples count:");
         int peoplesCount = console.readInt();
 
         String searchResult = flightsService.getAll()
@@ -85,19 +91,20 @@ public class Main {
                 .collect(Collectors.joining("\n"));
 
         if (searchResult.isEmpty()) {
-            console.println("No flight founded!");
+            console.printLine("No flight founded!");
             return;
         }
 
-        console.println(searchResult);
-        console.println("Enter flight ID:");
+        console.printLine(searchResult);
+        console.printLine("Enter flight ID:");
         String flight_id = console.readString();
         Optional<Flight> flight = flightsService.get(flight_id);
 
         if (!flight.isPresent()) {
-            console.println("Incorrect flight ID!");
+            console.printLine("Incorrect flight ID!");
             return;
         }
+        console.printLine(flight.get().toString());
         Flight bookedFight = flight.get();
 
 
@@ -112,7 +119,7 @@ public class Main {
 
         try {
             bookingController.add(bookingTickets);
-            console.println(String.format("Congratulations ! You have booked %d ticket%c!", peoplesCount, peoplesCount > 1 ? 's' : ' '));
+            console.printLine(String.format("Congratulations ! You have booked %d ticket%c!", peoplesCount, peoplesCount > 1 ? 's' : ' '));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -130,14 +137,14 @@ public class Main {
         if (first.isPresent()) {
             boolean isUser = first.get().checkUser(login, password);
             if (isUser) {
-                console.println("Shadow logged...");
+                console.printLine("Shadow logged...");
                 user = new User("Name", "Surname", "login", "password");
             } else {
-                console.println("Wrong password !");
+                console.printLine("Wrong password !");
                 logoutCallback(console);
             }
         } else {
-            console.println("Wrong login !");
+            console.printLine("Wrong login !");
             logoutCallback(console);
         }
     }
@@ -147,7 +154,7 @@ public class Main {
     }
 
     public static String getValue(Console console, String message, Predicate<String> predicate, String error) {
-        console.println(message);
+        console.printLine(message);
         return console.readString(predicate, error);
     }
 
@@ -164,17 +171,18 @@ public class Main {
         user = new User(name, surname, login, password);
         try {
             usersController.addUser(user);
+            console.printLine(String.format("User is registered! Hello, @%s", user.login));
         } catch (IOException e) {
+            console.printLine("Something went wrong...");
         }
-        console.println(String.format("User is registered! Hello, @%s", user.login));
     }
 
     public static void displayMyFlightsCallback(Console console) {
-        user.getAllTickets().stream().map(Ticket::toString).forEach(console::println);
+        user.getAllTickets().stream().map(Ticket::toString).forEach(console::printLine);
     }
 
     public static void cancelFlightBookCallback(Console console) {
-        console.println("Your tickets:");
+        console.printLine("Your tickets:");
         displayMyFlightsCallback(console);
 
         String ticketNumber = getValue(console, "enter ticket number", n -> bookingController.getAll().stream().anyMatch(t -> t.ticketNumber.equals(n)), "enter the valid ticket number");
@@ -200,7 +208,7 @@ public class Main {
             callbacks.add(new Callback("Display my flights", Main::displayMyFlightsCallback));
             callbacks.add(new Callback("Logout", Main::logoutCallback));
         }
-        callbacks.add(new ExitCallback());
+        callbacks.add(exitCallback);
 
         return callbacks;
     }
